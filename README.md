@@ -1,4 +1,6 @@
-`dommy.template` is a fork of Prismatic's [dommy](https://github.com/Prismatic/dommy) which provides only DOM templating functionality.
+# `dommy.template`
+
+`dommy.template` is a fork of Prismatic's [dommy](https://github.com/Prismatic/dommy), with DOM templating functionality only.
 
 All templating features of dommy contained in version 0.1.3 were dropped from version 1.0.0. This fork is also based on 0.1.3 and is kind of complement of dommy 1.0.0: all other features except templating has been dropped. The main goal of this fork is to act as a drop-in replacement for dommy, provideing templating macros `node` and `deftemplate`.
 
