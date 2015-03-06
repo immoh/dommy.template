@@ -32,10 +32,10 @@
                        (.append (-> "<span>" js/jQuery (.text (:name datum))))))))))
 
 (defn run-test [root data li-fn]
-  (let [now (js/Date.)]
+  (let [now (.getTime (js/Date.))]
     (doseq [d data]
       (.append root (li-fn d)))
-    (/ (- (js/Date.) now) 1000)))
+    (/ (- (.getTime (js/Date.)) now) 1000)))
 
 (defn gen-data []
   (for [i (range 1e4)]
