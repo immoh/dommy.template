@@ -1,79 +1,38 @@
-<img src="resources/logo.png" width="270" />
+# `dommy.template`
 
-A ClojureScript DOM manipulation, templating and event library.
+`dommy.template` is a fork of Prismatic's [dommy](https://github.com/Prismatic/dommy) with DOM templating functionality only.
+
+Dommy version 0.1.3 was not compatible with ClojureScript version 0.0-2341 and above. In order to make it compatible with ClojureScript compiler, all templating features of dommy contained in version 0.1.3 were dropped from version 1.0.0. (See [this pull request](https://github.com/Prismatic/dommy/pull/85) for more details.)
+
+This fork is also based on dommy 0.1.3 and is kind of complement of dommy 1.0.0: it is compatible with ClojureScript version 0.0-2341 and above but all other features *except* templating have been dropped. The main goal of this fork is to act as a drop-in replacement for templating features of dommy 0.1.3, providing templating macros `node` and `deftemplate`.
 
 ## Usage
 
 Add the following dependency to your `project.clj`:
 
 ```clojure
-[prismatic/dommy "0.1.2"]
+[immoh/dommy.template "0.2.0-SNAPSHOT"]
 ```
 
-### Selection
+### Migration from `dommy` 0.1.3
 
-DOM nodes are selected using macros, which expand to the correct native dom calls. Because selectors don't wrap returned nodes, there is a distinction between single and multiple selections. A selector can be a keyword, string or vector.
+Macros `node` and `deftemplate` have been moved from namespace `dommy.macros` to `dommy.template`. Update your imports accordingly.
 
-```clojure
-(ns …
-  (:require 
-    [dommy.utils :as utils]
-    [dommy.core :as dommy])
-  (:use-macros
-    [dommy.macros :only [node sel sel1]]))
-
-(sel1 :body) ; => document.body
-(sel1 :#header) ; => document.getElementById("header")
-(sel1 ".todo") ; => document.getElementsByClassName("todo")[0]
-
-(sel [:#todos :li]) ; => document.querySelectorAll("#todos li")
-```
-
-### DOM Manipulation
-
-Inspired by [jQuery](http://jquery.com), but adapted to be functional in order to better fit with ClojureScript core.
-
-```clojure
-(dommy/append! (sel1 :#todos) [:.todo "Eat some cake"])
-
-(doseq [todo (sel :.todo)]
-  (dommy/add-class! todo :complete))
-
-(map dommy/text (sel :.todo))
-```
-
-Functions that modify take the target dom node as their first argument, and return the same modified node, allowing the use of threading macros to accomplish jQuery-like chaining.
-
-```clojure
-(-> (sel1 :#my-button)
-	(dommy/remove-attr! :disabled)
-	(dommy/add-class! :active)
-	(dommy/set-text! "Click me!"))
-
-(->> (sel :.image)
-	 (filter #(> (dommy/px % :width) 500))
-	 (map #(dommy/add-class! % :big-image)))
-```
-
-Dom manipulation is defined in [dommy.core](https://github.com/Prismatic/dommy/blob/master/src/dommy/core.cljs) and [dommy.attrs](https://github.com/Prismatic/dommy/blob/master/src/dommy/attrs.cljs).
-
-### Templating
+### Templating (adapted from original documentation) 
 
 Templating syntax is based on [Hiccup](https://github.com/weavejester/hiccup/), a great HTML library for Clojure. Instead of returning a string of html, dommy's `node` macro returns a DOM node.
 
 ```clojure
 (ns …
-  (:require [dommy.core])
-  (:use-macros
-    [dommy.macros :only [node]]))
+  (:require [dommy.template :as t]))
 
-(node
+(t/node
   [:div#id.class1
     (for [r (range 2)]
       [:span.text (str "word" r)])]) ;; => [object HTMLElement]
 
 ;; Styles can be inlined as a map
-(node
+(t/node
   [:span
     {:style
       {:color "#aaa"
@@ -84,61 +43,25 @@ The `deftemplate` macro is useful syntactic sugar for defining a function that r
 
 ```clojure
 (ns …
-  (:require [dommy.core])
-  (:use-macros
-    [dommy.macros :only [node deftemplate]]))
+  (:require [dommy.template :as t]))
 
 (defn simple-template [cat]
-  (node [:img {:src cat}]))
+  (t/node [:img {:src cat}]))
 
-(deftemplate simple-template [cat]
+(t/deftemplate simple-template [cat]
   [:img {:src cat}])
 ```
 
-Thanks to [@ibdknox](https://github.com/ibdknox/), you can define view logic for custom types by implementing the `PElement` protocol:
-
-```clojure
-(defrecord MyModel [data]
-   dommy.template/PElement
-   (-elem [this] (node [:p (str "My data " data)])))
-
-(dommy/append! (sel1 :body) (MyModel. "is big"))
-```
-
-### Type-Hinting Template Macros
+#### Type-Hinting Template Macros
 
 One caveat of using the compile-macro is that if you have a compound element (a vector element) and want to have a non-literal map as the attributes (the second element of the vector), then you need to use <code>^:attrs</code> meta-data so the compiler knows to process this symbol as a map of attributes in the runtime system. Here's an example:
 
 ```clojure
-(node [:a ^:attrs (merge m1 m2)])
+(t/node [:a ^:attrs (merge m1 m2)])
 ```
-
-### Events
-
-Listening for events in dommy is pretty straightforward. `listen!` takes a DOM node, a macro describing the event and the function to run in the case of that event being triggered.
-
-```clojure
-(ns …
-  (:require
-    [dommy.core :as dommy])
-  (:use-macros
-    [dommy.macros :only [sel1]]))
-
-(defn clickEvent [event]
-    (.log js/console "You have clicked the button! Congratulations"))
-
-(dommy/listen! (sel1 :#clickButton)
-                :click clickEvent)
-```
-
-## Testing
-
-For all pull requests, please ensure your tests pass (or add test cases) before submitting. 
-
-    $ lein test
 
 ## License
 
-Copyright (C) 2013 Prismatic
+Copyright (C) 2013-2014 Prismatic, 2015 Immo Heikkinen
 
 Distributed under the Eclipse Public License, the same as Clojure.
