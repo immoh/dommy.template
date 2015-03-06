@@ -1,7 +1,7 @@
 (ns dommy.template-test
   (:use-macros
    [cemerick.cljs.test :only [is deftest]]
-   [dommy.macros :only [deftemplate node]])
+   [dommy.template :only [deftemplate node]])
   (:require
    [cemerick.cljs.test :as test]
    [dommy.template :as template]))

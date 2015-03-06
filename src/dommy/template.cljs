@@ -1,5 +1,5 @@
 (ns dommy.template
-  (:use-macros [dommy.macros :only [node]])
+  (:use-macros [dommy.template :only [node]])
   (:require [clojure.string :as str]))
 
 (declare ->node-like)
