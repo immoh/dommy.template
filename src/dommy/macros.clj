@@ -22,7 +22,7 @@
   `(when ~v
      ~(cond
        (identical? k :class) `(set! (.-className ~d) (.trim (str (.-className ~d) " " ~v)))
-       (identical? k :style) `(.setAttribute ~d ~(as-str k) (dommy.attrs/style-str ~v))
+       (identical? k :style) `(.setAttribute ~d ~(as-str k) (dommy.template/style-str ~v))
        ;; If we can compile into a single string at compile time, then make single string
        ;; and set it. Otherwise, need to fall back to calling runtime set-attr! for each class
        (identical? k :classes) (if (every? #(or (string? %) (keyword? %)) v)
@@ -58,10 +58,10 @@
        ~@(for [[k v] literal-attrs]
            (if (keyword? k)
              `(compile-add-attr! ~dom-sym ~k ~v)
-             `(dommy.attrs/set-attr! ~dom-sym ~k ~v)))
+             `(dommy.template/set-attr! ~dom-sym ~k ~v)))
        ~@(when var-attrs
            [`(doseq [[k# v#] ~var-attrs]
-               (dommy.attrs/set-attr! ~dom-sym k# v#))])
+               (dommy.template/set-attr! ~dom-sym k# v#))])
        ~@(for [c children]
            `(.appendChild ~dom-sym (node ~c)))
        ~dom-sym)))
