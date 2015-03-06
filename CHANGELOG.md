@@ -1,3 +1,12 @@
+# `immoh/dommy.template`
+
+## 0.2.0
+
+*   Drop everything else but templating
+*   Move all macros and functions to `dommy.template`
+
+# `Prismatic/dommy`
+
 ## 0.1.3
 
 *   Fix add-class! for when element.classList is not supported (Prismatic/dommy#59)

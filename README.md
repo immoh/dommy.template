@@ -11,7 +11,7 @@ This fork is also based on dommy 0.1.3 and is kind of complement of dommy 1.0.0:
 Add the following dependency to your `project.clj`:
 
 ```clojure
-[immoh/dommy.template "0.2.0-SNAPSHOT"]
+[immoh/dommy.template "0.2.0"]
 ```
 
 ### Migration from `dommy` 0.1.3

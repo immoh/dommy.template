@@ -1,4 +1,4 @@
-(defproject immoh/dommy.template "0.2.0-SNAPSHOT"
+(defproject immoh/dommy.template "0.2.0"
   :clojurescript? true
   :description "Clojurescript DOM templating"
   :url "https://github.com/immoh/dommy.template"
