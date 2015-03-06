@@ -1,15 +1,9 @@
-(defproject prismatic/dommy "0.1.3"
+(defproject immoh/dommy.template "0.2.0-SNAPSHOT"
   :clojurescript? true
-  :description "Clojurescript DOM templating and manipulation"
-  :url "https://github.com/prismatic/dommy"
+  :description "Clojurescript DOM templating"
+  :url "https://github.com/immoh/dommy.template"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :scm {:url "git@github.com:prismatic/dommy.git"}
-  :pom-addition [:developers [:developer
-                              [:name "Prismatic"]
-                              [:url "http://getprismatic.com"]
-                              [:email "admin+oss@getprismatic.com"]
-                              [:timezone "-8"]]]
   :plugins [[lein-cljsbuild "0.3.2"]
             [com.cemerick/clojurescript.test "0.2.1"]
             [com.cemerick/austin "0.1.3"]]
