@@ -2,17 +2,9 @@
   (:use-macros
    [dommy.macros :only [node]])
   (:require
-   [dommy.template :as template]
-   [crate.core :as crate]))
+    [crate.core :as crate]))
 
 ;; Perf Test: dommy vs. crate. vs. jQuery
-
-(defn dommy-template [datum]
-  (template/node
-   [:li [:a {:href (str "#show/" (:key datum))}
-         [:div.class1.class2 {:id (str "item" (:key datum))}
-          [:span.anchor (:name datum)]]]]))
-
 
 (defn dommy-compiled [datum]
   (node
@@ -55,18 +47,10 @@
             (shuffle
              [[:jquery jquery-template]
               [:crate crate-template]
-              [:dommy dommy-template]
               [:dommy-compiled dommy-compiled]])]    
       (let [ul  (-> "<ul>" js/jQuery (.addClass "products"))
             secs (run-test ul data li-fn)]
         [key secs])))
-
-(defn ^:export dommy-profile []
-  (let [data (doall (gen-data))]
-    (dotimes [_ 3]
-      (let [ul  (-> "<ul>" js/jQuery (.addClass "products"))]
-        (run-test ul data dommy-template))
-      (.log js/console "DONE"))))
 
 (defn ^:export perf-test []
   (let [data (doall (gen-data))]

@@ -1,6 +1,5 @@
 (ns dommy.template
   (:require
-   [clojure.string :as str]
    [dommy.attrs :as attrs]
    [dommy.utils :refer [as-str]]))
 
@@ -146,11 +145,6 @@
   (extend-protocol PElement
     js/Window
     (-elem [this] this)))
-
-(defn node [data]
-  (if (satisfies? PElement data)
-    (-elem data)
-    (throw-unable-to-make-node data)))
 
 (defn html->nodes [html]
   (let [parent (.createElement js/document "div")]

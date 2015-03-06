@@ -8,37 +8,27 @@
 
 
 (deftest simple-template
-  (is (= "B" (-> [:b] template/node .-tagName)))
-  (is (= "some text" (-> "some text" template/node .-textContent)))
   ;; unfortunately to satisfy the macro gods, you need to
   ;; duplicate the vector literal to test compiled and runtime template
-  (let [e1 (template/node [:span "some text"])
-        e2 (node [:span "some text"])]
-    (doseq [e [e1 e2]]
-      (is (= "SPAN" (.-tagName e)))
-      (is (= "some text" (.-textContent e)))
-      (is (= js/document.TEXT_NODE (-> e .-childNodes (aget 0) .-nodeType)))
-      (is (zero? (-> e .-children .-length)))))
-  (let [e1 (template/node [:a {:classes ["class1" "class2"] :href "http://somelink"} "anchor"])
-        e2 (node
+  (let [e (node [:span "some text"])]
+    (is (= "SPAN" (.-tagName e)))
+    (is (= "some text" (.-textContent e)))
+    (is (= js/document.TEXT_NODE (-> e .-childNodes (aget 0) .-nodeType)))
+    (is (zero? (-> e .-children .-length))))
+  (let [e (node
             [:a {:classes ["class1" "class2"] :href "http://somelink"} "anchor"])]
-    (doseq [e [e1 e2]] (is (-> e .-tagName (= "A")))
-           (is (= "anchor" (.-textContent e)))
-           (is (= "http://somelink" (.getAttribute e "href")))
-           (is (= "class1 class2" (.-className e)))))
+    (is (-> e .-tagName (= "A")))
+    (is (= "anchor" (.-textContent e)))
+    (is (= "http://somelink" (.getAttribute e "href")))
+    (is (= "class1 class2" (.-className e))))
   (let [e1 (template/base-element :div#id.class1.class2)
         e2 (node :div#id.class1.class2)]
     (doseq [e [e1 e2]]
       (is (= "DIV" (.-tagName e)))
       (is (= "id" (.getAttribute e "id")))
       (is (= "class1 class2" (.-className e)))))
-  (let [e (template/node [:div#id/test {:class :class/test}])]
-    (is (= "class/test" (.-className e)))
-    (is (= "id/test" (.getAttribute e "id"))))
-  (let [e1 (template/node [:div#id {:class "class1 class2"}])
-        e2 (node [:div#id {:class "class1 class2"}])]
-    (doseq [e [e1 e2]]
-      (is (= "class1 class2" (.-className e)))))
+  (let [e (node [:div#id {:class "class1 class2"}])]
+    (is (= "class1 class2" (.-className e))))
   (let [e1 (template/compound-element [:div {:style {:margin-left "15px"}}])
         e2 (node [:div {:style {:margin-left "15px"}}])]
     (doseq [e [e1 e2]]
@@ -56,17 +46,11 @@
              (.-innerHTML e)))
       (is (= "span1" (-> e .-childNodes (aget 0) .-innerHTML)))
       (is (= "span2" (-> e .-childNodes (aget 1) .-innerHTML)))))
-  (is (= "<span id=\"id1\">span1</span><span id=\"id2\">span2</span>"
-         (-> [:div (for [x [1 2]] [:span {:id (str "id" x)} (str "span" x)])]
-             template/node
-             .-innerHTML)))
   (let [e (first (template/html->nodes "<div><p>some-text</p></div>"))]
     (is (= "DIV" ( .-tagName e)))
-    (is (= "<p>some-text</p>" (.-innerHTML e)))
-    (is (=  e (template/node e))))
+    (is (= "<p>some-text</p>" (.-innerHTML e))))
   (let [comment (first (template/html->nodes "<!--a comment should not throw an exception-->"))]
-    (is (= "a comment should not throw an exception" (.-textContent comment)))
-    (is (= comment (template/node comment)))))
+    (is (= "a comment should not throw an exception" (.-textContent comment)))))
 
 (deftest nested-template-test
   ;; test html for example list form
@@ -74,17 +58,15 @@
   (let [spans (for [i (range 2)] [:span (str "span" i)])
         end [:span.end "end"]
         h   [:div#id1.class1 (list spans end)]
-        e1 (template/compound-element h)
-        e2 (template/node             h)]
-    (doseq [e [e1 e2]]
-      (is (-> e .-textContent (= "span0span1end")))
-      (is (-> e .-className (= "class1")))
-      (is (-> e .-childNodes .-length (= 3)))
-      (is (-> e .-innerHTML
-              (= "<span>span0</span><span>span1</span><span class=\"end\">end</span>")))
-      (is (-> e .-childNodes (aget 0) .-innerHTML (= "span0")))
-      (is (-> e .-childNodes (aget 1) .-innerHTML (= "span1")))
-      (is (-> e .-childNodes (aget 2) .-innerHTML (= "end")))))
+        e (template/compound-element h)]
+    (is (-> e .-textContent (= "span0span1end")))
+    (is (-> e .-className (= "class1")))
+    (is (-> e .-childNodes .-length (= 3)))
+    (is (-> e .-innerHTML
+            (= "<span>span0</span><span>span1</span><span class=\"end\">end</span>")))
+    (is (-> e .-childNodes (aget 0) .-innerHTML (= "span0")))
+    (is (-> e .-childNodes (aget 1) .-innerHTML (= "span1")))
+    (is (-> e .-childNodes (aget 2) .-innerHTML (= "end"))))
 
   ;; test equivalence of "direct inline" and list forms
   (let [spans (for [i (range 2)] [:span (str "span" i)])
@@ -92,9 +74,9 @@
         h1    [:div.class1 (list spans end)]
         h2    [:div.class1 spans end]
         e11 (template/compound-element h1)
-        e12 (template/node             h1)
+        e12 (node             h1)
         e21 (template/compound-element h2)
-        e22 (template/node             h2)]
+        e22 (node             h2)]
     (doseq [[e1 e2] [[e11 e12]
                      [e12 e21]
                      [e21 e22]
@@ -102,30 +84,22 @@
       (is (= (.-innerHTML e1) (.-innerHTML e2))))))
 
 (deftest boolean-attribute
-  (let [e1 (template/node [:option {:selected true} "some text"])
-        e1c (node [:option {:selected true} "some text"])
-        e2 (template/node [:option {:selected false} "some text"])
-        e2c (node [:option {:selected false} "some text"])
-        e3 (template/node [:option {:selected nil} "some text"])
-        e3c (node [:option {:selected nil} "some text"])]
-    (doseq [e [e1 e1c]] (is (-> e (.getAttribute "selected") (= "true"))))
-    (doseq [e [e2 e2c]] (is (-> e (.getAttribute "selected") (nil?))))
-    (doseq [e [e3 e3c]] (is (-> e (.getAttribute "selected") (nil?))))))
+  (let [e1 (node [:option {:selected true} "some text"])
+        e2 (node [:option {:selected false} "some text"])
+        e3 (node [:option {:selected nil} "some text"])]
+    (is (-> e1 (.getAttribute "selected") (= "true")))
+    (is (-> e2 (.getAttribute "selected") (nil?)))
+    (is (-> e3 (.getAttribute "selected") (nil?)))))
 
 (deftest style-str
-  (let [e1 (template/node [:div {:style {:background-color "lime"}}])
-        e1c (node [:div {:style {:background-color "lime"}}])
-        e2 (template/node [:div {:style {:background-color :lime}}])
-        e2c (node [:div {:style {:background-color :lime}}])
-        e3 (template/node [:div {:style "background-color: lime"}])
-        e3c (node [:div {:style "background-color: lime"}])
-        e4 (template/node [:div {:style nil}])
-        e4c (node [:div {:style nil}])]
-    (doseq [e [e1 e1c]] (is (= (.getAttribute e "style") "background-color:lime;")))
-    (doseq [e [e2 e2c]] (is (= (.getAttribute e "style") "background-color:lime;")))
-    (doseq [e [e3 e3c]] (is (= (.getAttribute e "style") "background-color: lime")))
-    (doseq [e [e4 e4c]] (is (nil? (.getAttribute e "style"))))))
-
+  (let [e1 (node [:div {:style {:background-color "lime"}}])
+        e2 (node [:div {:style {:background-color :lime}}])
+        e3 (node [:div {:style "background-color: lime"}])
+        e4 (node [:div {:style nil}])]
+    (is (= (.getAttribute e1 "style") "background-color:lime;"))
+    (is (= (.getAttribute e2 "style") "background-color:lime;"))
+    (is (= (.getAttribute e3 "style") "background-color: lime"))
+    (is (nil? (.getAttribute e4 "style")))))
 
 (deftemplate simple-template [[href anchor]]
   [:a.anchor {:href href} ^:text anchor])
@@ -178,9 +152,9 @@
 
 (deftest nil-in-template
   (is (= "<span></span>"
-         (.-outerHTML (template/node [:span nil]))))
+         (.-outerHTML (node [:span nil]))))
   (is (= "<ul><li>0</li><li>2</li></ul>"
-         (.-outerHTML (template/node [:ul (for [i (range 3)]
+         (.-outerHTML (node [:ul (for [i (range 3)]
                                             (when (even? i)
                                               [:li i]))])))))
 (deftest nil-template-test
