@@ -8,8 +8,6 @@
             [com.cemerick/clojurescript.test "0.2.1"]
             [com.cemerick/austin "0.1.3"]]
 
-  :hooks [leiningen.cljsbuild]
-
   :profiles {:dev {:dependencies [[org.clojure/clojure "1.6.0"]
                                   [org.clojure/clojurescript "0.0-2913"]
                                   [crate "0.2.3"] ;; for perf test
