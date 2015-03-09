@@ -2,3 +2,5 @@ target/**
 .lein**
 pom.xml
 *~
+*.iml
+.idea/*
